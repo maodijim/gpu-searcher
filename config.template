@@ -1,0 +1,17 @@
+# Supported platforms are bestbuy,newegg
+platforms:
+#  - bestbuy
+  - newegg
+
+selenium_jar_path: selenium-server-standalone-3.141.59.jar
+firefox_driver_path:
+window_size: 1920x1080
+headless: false
+
+gpus:
+  - name: rtx 3080
+    price: 1000
+  - name: rtx 3080 ti
+    price: 1000
+  - name: rtx 3070 ti
+    price: 1000
