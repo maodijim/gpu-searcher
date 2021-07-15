@@ -11,14 +11,14 @@ import (
 )
 
 const (
-	bbUrl = "https://bestbuy.com"
+	bbUrl      = "https://bestbuy.com"
 	bbUrlRegex = `^.*bestbuy.com`
 )
 
 type BestBuyPlatform struct {
-	Wd	selenium.WebDriver
-	PlatformName	string
-	GpuTarget		[]config.GPUTarget
+	Wd           selenium.WebDriver
+	PlatformName string
+	GpuTarget    []config.GPUTarget
 }
 
 func (b *BestBuyPlatform) Search() (results []SearchResult) {
@@ -31,19 +31,26 @@ func (b *BestBuyPlatform) Search() (results []SearchResult) {
 	return results
 }
 
-func (b *BestBuyPlatform) Close()  {
-	b.Wd.Close()
+func (b *BestBuyPlatform) Close() {
+	err := b.Wd.Close()
+	if err != nil {
+		return
+	}
+	err = b.Wd.Quit()
+	if err != nil {
+		return
+	}
 }
 
 func (b *BestBuyPlatform) searchBestBuy(gpu config.GPUTarget) []SearchResult {
 	var results []SearchResult
 	curUrl, _ := b.Wd.CurrentURL()
-	if mat, _ := regexp.Match(bbUrlRegex, []byte(curUrl)); ! mat {
+	if mat, _ := regexp.Match(bbUrlRegex, []byte(curUrl)); !mat {
 		log.Warnf("current url %s is not bestbuy.com going bestbuy", curUrl)
 		_ = b.Wd.Get(bbUrl)
 	}
 
-	_ = b.Wd.WaitWithTimeout(waitModalElement, time.Second * 10)
+	_ = b.Wd.WaitWithTimeout(waitModalElement, time.Second*10)
 
 	closeModal, err := b.Wd.FindElement(selenium.ByCSSSelector, "button.c-close-icon.c-modal-close-icon")
 	if err != nil {
@@ -55,7 +62,7 @@ func (b *BestBuyPlatform) searchBestBuy(gpu config.GPUTarget) []SearchResult {
 	time.Sleep(time.Second * 1)
 	searchBar, err := b.Wd.FindElement(selenium.ByID, "gh-search-input")
 	if err != nil {
-		log.Errorf("%s failed to find search", BbPlatform)
+		log.Errorf("%s failed to find search", BbPlatformName)
 		return results
 	}
 	clearBtn, err := b.Wd.FindElement(selenium.ByCSSSelector, "#header-clear-search-icon")
@@ -66,7 +73,7 @@ func (b *BestBuyPlatform) searchBestBuy(gpu config.GPUTarget) []SearchResult {
 	// Set search keyword
 	searchBtn, err := b.Wd.FindElement(selenium.ByCSSSelector, "button.header-search-button")
 	if err != nil {
-		log.Errorf("%s failed to find search button", BbPlatform)
+		log.Errorf("%s failed to find search button", BbPlatformName)
 		return results
 	}
 	_ = searchBar.SendKeys(gpu.Name)
@@ -141,7 +148,9 @@ func (b *BestBuyPlatform) searchBestBuy(gpu config.GPUTarget) []SearchResult {
 	return results
 }
 
-func waitSkuElement(wd selenium.WebDriver) (bool, error)  {
+// TODO multi-page scanning
+
+func waitSkuElement(wd selenium.WebDriver) (bool, error) {
 	we, err := wd.FindElement(selenium.ByCSSSelector, "li.sku-item")
 	if err != nil {
 		return false, err
@@ -150,7 +159,7 @@ func waitSkuElement(wd selenium.WebDriver) (bool, error)  {
 	return display, err
 }
 
-func waitModalElement(wd selenium.WebDriver) (bool, error)  {
+func waitModalElement(wd selenium.WebDriver) (bool, error) {
 	we, err := wd.FindElement(selenium.ByCSSSelector, "button.c-close-icon.c-modal-close-icon")
 	if err != nil {
 		return false, err
@@ -161,9 +170,9 @@ func waitModalElement(wd selenium.WebDriver) (bool, error)  {
 
 func CreateBestBuySearch(caps map[string]interface{}, serverPort int, gpus []config.GPUTarget) Platform {
 	p := BestBuyPlatform{
-		PlatformName: BbPlatform,
-		Wd: utils.CreateWebDriver(caps, serverPort),
-		GpuTarget: gpus,
+		PlatformName: BbPlatformName,
+		Wd:           utils.CreateWebDriver(caps, serverPort),
+		GpuTarget:    gpus,
 	}
 	return &p
 }

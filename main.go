@@ -27,13 +27,12 @@ func main() {
 	confPath := flag.String("configPath", "config.template", "path to the config.conf file")
 	flag.Parse()
 	configs := config.ParseConfigs(*confPath)
-	if ! utils.IsDriverExists(configs.FireFoxDriverPath) {
+	if !utils.IsDriverExists(configs.FireFoxDriverPath) {
 		log.Infof("firefox driver not found download latest firefox dirver")
 		savePath := downloadDriver("")
 		utils.Unzip(savePath, "")
 	}
 
-	//TODO: Implement selenium driver to check GPU inventories'
 	opts := []selenium.ServiceOption{
 		//selenium.StartFrameBuffer(),
 		selenium.GeckoDriver(configs.FireFoxDriverPath),
@@ -43,7 +42,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer service.Stop()
+
+	defer func(service *selenium.Service) {
+		err := service.Stop()
+		if err != nil {
+			return
+		}
+	}(service)
 
 	caps := selenium.Capabilities{"browserName": "firefox"}
 	firefoxCaps := firefox.Capabilities{}
@@ -57,16 +62,21 @@ func main() {
 	}
 
 	var platformDrivers []platforms.Platform
+
 	// Create web driver for each platform
 	for _, p := range configs.Platforms {
-		if p == platforms.BbPlatform {
+		switch p {
+		case platforms.BbPlatformName:
 			bb := platforms.CreateBestBuySearch(caps, port, configs.GPUs)
 			platformDrivers = append(platformDrivers, bb)
- 		} else if p == platforms.NePlatform {
+		case platforms.NePlatformName:
 			ne := platforms.CreateNewEggSearch(caps, port, configs.GPUs)
 			platformDrivers = append(platformDrivers, ne)
-		} else {
- 			log.Warnf("unsupport platform %s, skipped", p)
+		case platforms.BhPlatformName:
+			bh := platforms.CreateBhSearch(caps, port, configs.GPUs)
+			platformDrivers = append(platformDrivers, bh)
+		default:
+			log.Warnf("unsupport platform %s, skipped", p)
 		}
 	}
 
@@ -81,5 +91,6 @@ func main() {
 		results := d.Search()
 		log.Infof("results: %v", results)
 	}
-}
 
+	// TODO Implement email notification
+}

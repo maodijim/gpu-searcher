@@ -1,25 +1,25 @@
 package platforms
 
 const (
-	BbPlatform = "bestbuy"
-	NePlatform = "newegg"
-	BhPlatform = "b&h"
+	BbPlatformName = "bestbuy"
+	NePlatformName = "newegg"
+	BhPlatformName = "b&h"
 )
 
 var (
 	SupportedPlatforms = []string{
-		BbPlatform,
-		NePlatform,
-		BhPlatform,
+		BbPlatformName,
+		NePlatformName,
+		BhPlatformName,
 	}
 )
 
 type SearchResult struct {
-	Price	float64
-	Title	string
-	Model	string
-	Url		string
-	Available	bool
+	Price     float64
+	Title     string
+	Model     string
+	Url       string
+	Available bool
 }
 
 type Platform interface {

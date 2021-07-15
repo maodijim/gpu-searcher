@@ -1,7 +1,8 @@
-# Supported platforms are bestbuy,newegg
+# Supported platforms are bestbuy,newegg,b&h
 platforms:
 #  - bestbuy
-  - newegg
+#  - newegg
+  - b&h
 
 selenium_jar_path: selenium-server-standalone-3.141.59.jar
 firefox_driver_path:

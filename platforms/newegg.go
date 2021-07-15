@@ -12,14 +12,14 @@ import (
 )
 
 const (
-	neUrl = "https://www.newegg.com"
+	neUrl      = "https://www.newegg.com"
 	neUrlRegex = `^.*newegg.com`
 )
 
 type NewEggPlatform struct {
-	Wd	selenium.WebDriver
-	PlatformName	string
-	GpuTarget		[]config.GPUTarget
+	Wd           selenium.WebDriver
+	PlatformName string
+	GpuTarget    []config.GPUTarget
 }
 
 func (n *NewEggPlatform) Search() (results []SearchResult) {
@@ -35,12 +35,16 @@ func (n *NewEggPlatform) Close() {
 	if err != nil {
 		return
 	}
+	err = n.Wd.Quit()
+	if err != nil {
+		return
+	}
 }
 
 func (n *NewEggPlatform) searchNewEgg(gpu config.GPUTarget) []SearchResult {
 	var results []SearchResult
 	curUrl, _ := n.Wd.CurrentURL()
-	if mat, _ :=regexp.Match(neUrlRegex, []byte(curUrl)); !mat {
+	if mat, _ := regexp.Match(neUrlRegex, []byte(curUrl)); !mat {
 		log.Infof("current url %s is not newegg.com redirecting to newegg.com", curUrl)
 		err := n.Wd.Get(neUrl)
 		if err != nil {
@@ -126,12 +130,13 @@ func (n *NewEggPlatform) searchNewEgg(gpu config.GPUTarget) []SearchResult {
 	return results
 }
 
+// TODO multi-page scanning
+
 func CreateNewEggSearch(caps map[string]interface{}, serverPort int, gpus []config.GPUTarget) Platform {
 	p := NewEggPlatform{
-		PlatformName: NePlatform,
-		Wd: utils.CreateWebDriver(caps, serverPort),
-		GpuTarget: gpus,
+		PlatformName: NePlatformName,
+		Wd:           utils.CreateWebDriver(caps, serverPort),
+		GpuTarget:    gpus,
 	}
 	return &p
 }
-
