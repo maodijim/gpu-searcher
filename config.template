@@ -16,3 +16,17 @@ gpus:
     price: 1000
   - name: rtx 3070 ti
     price: 1000
+
+notification:
+  notiy_conditions:
+    notify_when_unavailable: false
+  email:
+    smtp_server:
+    smtp_port: 587
+    smtp_user:
+    smtp_pass:
+    start_tls: true
+    sender: test@test.com
+    recipients:
+      - test@test.com
+

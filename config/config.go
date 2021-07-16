@@ -9,17 +9,37 @@ import (
 )
 
 type GPUTarget struct {
-	Name	string	`yaml:"name"`
-	Price	string	`yaml:"price"`
+	Name  string `yaml:"name"`
+	Price string `yaml:"price"`
+}
+
+type NotifyConditions struct {
+	NotifyUnavailable bool `yaml:"notify_when_unavailable"`
+}
+
+type NotificationType struct {
+	NotifyConditions NotifyConditions  `yaml:"notify_conditions"`
+	Email            EmailNotification `yaml:"email"`
+}
+
+type EmailNotification struct {
+	SmtpServer string   `yaml:"smtp_server"`
+	SmtpPort   uint     `yaml:"smtp_port"`
+	SmtpUser   string   `yaml:"smtp_user"`
+	SmtpPass   string   `yaml:"smtp_pass"`
+	StartTLS   bool     `yaml:"start_tls"`
+	Sender     string   `yaml:"sender"`
+	Recipients []string `yaml:"recipients"`
 }
 
 type Configs struct {
-	Platforms         	[]string 	`yaml:"platforms"`
-	FireFoxDriverPath 	string   	`yaml:"firefox_driver_path"`
-	Headless			bool		`yaml:"headless"`
-	GPUs				[]GPUTarget	`yaml:"gpus"`
-	SeleniumJarPath		string		`yaml:"selenium_jar_path"`
-	WindowSize			string		`yaml:"window_size"`
+	Platforms         []string         `yaml:"platforms"`
+	FireFoxDriverPath string           `yaml:"firefox_driver_path"`
+	Headless          bool             `yaml:"headless"`
+	GPUs              []GPUTarget      `yaml:"gpus"`
+	SeleniumJarPath   string           `yaml:"selenium_jar_path"`
+	WindowSize        string           `yaml:"window_size"`
+	Notification      NotificationType `yaml:"notification"`
 }
 
 func (c *Configs) GetWindowSize() (x, y uint64) {
